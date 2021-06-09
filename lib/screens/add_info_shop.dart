@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_appfood/utility/my_style.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class AddInfoShop extends StatefulWidget {
   @override
@@ -22,24 +23,48 @@ class _AddInfoShopState extends State<AddInfoShop> {
             addressForm(),
             MyStyle().mySizedbox(),
             phonForm(),
-            MyStyle().mySizedbox(),
             groupImage(),
-            MyStyle().mySizedbox(),
             showMap(),
+            MyStyle().mySizedbox(),
+            saveButton(),
           ],
         ),
       ),
     );
   }
 
-  Container showMap() {
+  Widget saveButton() {
     return Container(
-            height: 300.0,
-          );
+      margin: EdgeInsets.only(right: 50.0, left: 50.0),
+      width: MediaQuery.of(context).size.width,
+      child: RaisedButton.icon(
+        color: MyStyle().primaryColor,
+        onPressed: () {},
+        icon: Icon(Icons.save),
+        label: Text('Save Infomation'),
+      ),
+    );
+  }
+
+  Container showMap() {
+    LatLng latLng = LatLng(13.780529435317023, 100.63833511720829);
+    CameraPosition cameraPosition = CameraPosition(
+      target: latLng,
+      zoom: 16.0,
+    );
+    return Container(
+      margin: EdgeInsets.only(right: 20.0, left: 20.0),
+      child: GoogleMap(
+        initialCameraPosition: cameraPosition,
+        mapType: MapType.normal,
+        onMapCreated: (controller) {},
+      ),
+      height: 300.0,
+    );
   }
 
   Widget groupImage() => Container(
-        padding: EdgeInsets.all(20),
+        margin: EdgeInsets.only(right: 20.0, left: 20.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
