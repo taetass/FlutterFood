@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_appfood/utility/my_style.dart';
+import 'package:flutter_appfood/utility/normal_dialog.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
@@ -55,7 +56,9 @@ class _AddInfoShopState extends State<AddInfoShop> {
             addressForm(),
             MyStyle().mySizedbox(),
             phonForm(),
+            MyStyle().mySizedbox(),
             groupImage(),
+            MyStyle().mySizedbox(),
             lat == null ? MyStyle().showProgress() : showMap(),
             MyStyle().mySizedbox(),
             saveButton(),
@@ -77,7 +80,12 @@ class _AddInfoShopState extends State<AddInfoShop> {
               address == null ||
               address.isEmpty ||
               phone == null ||
-              phone.isEmpty) {}
+              phone.isEmpty) {
+                normolDialog(context, 'กรุณากรอกข้อมูลให้ครบค่ะ');
+              } else if (_image == null) {
+                normolDialog(context, 'กรุณาเลือกรูปภาพค่ะ');
+              } else {
+              }
         },
         icon: Icon(Icons.save),
         label: Text('Save Infomation'),
