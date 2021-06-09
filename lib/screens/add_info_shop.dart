@@ -9,19 +9,20 @@ class AddInfoShop extends StatefulWidget {
 }
 
 class _AddInfoShopState extends State<AddInfoShop> {
-
   double lat, lng;
-  
+
   @override
-  void initState() { 
+  void initState() {
     super.initState();
     findLatLng();
   }
 
   Future<Null> findLatLng() async {
     LocationData locationData = await findLocationData();
-    lat = locationData.latitude;
-    lng = locationData.longitude;
+    setState(() {
+      lat = locationData.latitude;
+      lng = locationData.longitude;
+    });
     print('lat = $lat, lng = $lng');
   }
 
@@ -33,7 +34,7 @@ class _AddInfoShopState extends State<AddInfoShop> {
       return null;
     }
   }
-   
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +51,7 @@ class _AddInfoShopState extends State<AddInfoShop> {
             MyStyle().mySizedbox(),
             phonForm(),
             groupImage(),
-            showMap(),
+            lat == null ? MyStyle().showProgress() : showMap(),
             MyStyle().mySizedbox(),
             saveButton(),
           ],
@@ -72,8 +73,18 @@ class _AddInfoShopState extends State<AddInfoShop> {
     );
   }
 
+  Set<Marker> myMarker() {
+    return <Marker>[
+      Marker(
+        markerId: MarkerId('myShop'),
+        position: LatLng(lat, lng),
+        infoWindow: InfoWindow(title: 'ร้านของคุณ!!', snippet: '$lat , $lng')
+      )
+    ].toSet();
+  }
+
   Container showMap() {
-    LatLng latLng = LatLng(13.780529435317023, 100.63833511720829);
+    LatLng latLng = LatLng(lat, lng);
     CameraPosition cameraPosition = CameraPosition(
       target: latLng,
       zoom: 16.0,
@@ -84,6 +95,7 @@ class _AddInfoShopState extends State<AddInfoShop> {
         initialCameraPosition: cameraPosition,
         mapType: MapType.normal,
         onMapCreated: (controller) {},
+        markers: myMarker(),
       ),
       height: 300.0,
     );

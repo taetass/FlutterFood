@@ -4,6 +4,10 @@ class MyStyle {
   Color darkColor = Colors.blue.shade500;
   Color primaryColor = Colors.lightGreen.shade300;
 
+  Widget showProgress() {
+    return Center(child: CircularProgressIndicator(),);
+  }
+
   SizedBox mySizedbox() => SizedBox(
         width: 8.0,
         height: 16.0,
