@@ -7,6 +7,7 @@ import 'package:flutter_appfood/utility/normal_dialog.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddInfoShop extends StatefulWidget {
   @override
@@ -112,10 +113,27 @@ class _AddInfoShopState extends State<AddInfoShop> {
       FormData formData = FormData.fromMap(map);
       await Dio().post(url, data: formData).then((value) {
         print('Respone ==>> $value');
-        urlImage = 'http://localhost/FlutterFood/Shop/$nameImage';
+        urlImage = '/FlutterFood/Shop/$nameImage';
         print('urlImage = $urlImage');
+        editUserShop();
       });
     } catch (e) {}
+  }
+
+  Future<Null> editUserShop() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String id = preferences.getString('id');
+
+    String url =
+        'http://localhost/FlutterFood/editDataWhereId.php?isAdd=true&id=$id&NameShop=$nameShop&Address=$address&Phone=$phone&UrlPicture=$urlImage&Lat=$lat&Lng=$lng';
+
+    await Dio().get(url).then((value) {
+      if (value.toString() == 'true') {
+        Navigator.pop(context);
+      } else {
+        normolDialog(context, 'กรุณา ลองใหม่');
+      }
+    });
   }
 
   Set<Marker> myMarker() {
