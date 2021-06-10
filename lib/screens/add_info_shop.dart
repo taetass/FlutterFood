@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_appfood/utility/my_style.dart';
 import 'package:flutter_appfood/utility/normal_dialog.dart';
@@ -13,9 +15,9 @@ class AddInfoShop extends StatefulWidget {
 
 class _AddInfoShopState extends State<AddInfoShop> {
   double lat, lng;
-  File _image;
+  File file;
   final picker = ImagePicker();
-  String nameShop, address, phone;
+  String nameShop, address, phone, urlImage;
 
   @override
   void initState() {
@@ -81,16 +83,39 @@ class _AddInfoShopState extends State<AddInfoShop> {
               address.isEmpty ||
               phone == null ||
               phone.isEmpty) {
-                normolDialog(context, 'กรุณากรอกข้อมูลให้ครบค่ะ');
-              } else if (_image == null) {
-                normolDialog(context, 'กรุณาเลือกรูปภาพค่ะ');
-              } else {
-              }
+            normolDialog(context, 'กรุณากรอกข้อมูลให้ครบค่ะ');
+          } else if (file == null) {
+            normolDialog(context, 'กรุณาเลือกรูปภาพค่ะ');
+          } else {
+            UploadImage();
+          }
         },
         icon: Icon(Icons.save),
         label: Text('Save Infomation'),
       ),
     );
+  }
+
+  Future<Null> UploadImage() async {
+    Random random = Random();
+    int i = random.nextInt(1000000);
+    String nameImage = 'shop$i.jpg';
+
+    String url = 'http://localhost/FlutterFood/saveShop.php';
+
+    try {
+      Map<String, dynamic> map = Map();
+      map['file'] = await MultipartFile.fromFile(
+        file.path,
+        filename: nameImage,
+      );
+      FormData formData = FormData.fromMap(map);
+      await Dio().post(url, data: formData).then((value) {
+        print('Respone ==>> $value');
+        urlImage = 'http://localhost/FlutterFood/Shop/$nameImage';
+        print('urlImage = $urlImage');
+      });
+    } catch (e) {}
   }
 
   Set<Marker> myMarker() {
@@ -135,9 +160,9 @@ class _AddInfoShopState extends State<AddInfoShop> {
             ),
             Container(
               width: 250.0,
-              child: _image == null
+              child: file == null
                   ? Image.asset('images/shop1.png')
-                  : Image.file(_image),
+                  : Image.file(file),
             ),
             IconButton(
               icon: Icon(
@@ -155,7 +180,7 @@ class _AddInfoShopState extends State<AddInfoShop> {
 
     setState(() {
       if (pickedFile != null) {
-        _image = File(pickedFile.path);
+        file = File(pickedFile.path);
       } else {
         print('No image selected.');
       }
@@ -167,7 +192,7 @@ class _AddInfoShopState extends State<AddInfoShop> {
 
     setState(() {
       if (pickedFile != null) {
-        _image = File(pickedFile.path);
+        file = File(pickedFile.path);
       } else {
         print('No image selected.');
       }
