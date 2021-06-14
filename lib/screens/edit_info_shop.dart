@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,6 @@ class _EditInfoShopState extends State<EditInfoShop> {
   Location location = Location();
   double lat, lng;
   File file;
-  final picker = ImagePicker();
 
   @override
   void initState() {
@@ -126,18 +126,31 @@ class _EditInfoShopState extends State<EditInfoShop> {
   }
 
   Future<Null> editThread() async {
-    String id = userModel.id;
-    print('id = $id');
+    Random random = Random();
+    int i = random.nextInt(10000);
+    String nameFile = 'editShop$i.jpg';
 
-    String url =
-        'http://localhost/FlutterFood/editDataWhereId.php?isAdd=true&id=$id&NameShop=$nameShop&Address=$address&Phone=$phone&UrlPicture=$urlPicture&Lat=$lat&Lng=$lng';
+    Map<String, dynamic> map = Map();
+    map['file'] = await MultipartFile.fromFile(file.path, filename: nameFile);
+    FormData formData = FormData.fromMap(map);
 
-    Response response = await Dio().get(url);
-    if (response.toString() == 'true') {
-      Navigator.pop(context);
-    } else {
-      normolDialog(context, 'กรุณาลองใหม่ค่ะ');
-    }
+    String urlUpload = 'http://localhost/FlutterFood/saveShop.php';
+    await Dio().post(urlUpload, data: formData).then((value) async {
+      urlPicture = '/FlutterFood/Shop/$nameFile';
+
+      String id = userModel.id;
+      print('id = $id');
+
+      String url =
+          'http://localhost/FlutterFood/editDataWhereId.php?isAdd=true&id=$id&NameShop=$nameShop&Address=$address&Phone=$phone&UrlPicture=$urlPicture&Lat=$lat&Lng=$lng';
+
+      Response response = await Dio().get(url);
+      if (response.toString() == 'true') {
+        Navigator.pop(context);
+      } else {
+        normolDialog(context, 'กรุณาลองใหม่ค่ะ');
+      }
+    });
   }
 
   Set<Marker> currentMaker() {
@@ -176,43 +189,32 @@ class _EditInfoShopState extends State<EditInfoShop> {
           children: <Widget>[
             IconButton(
               icon: Icon(Icons.add_a_photo),
-              onPressed: () => getImageCa(),
+              onPressed: () => chooseImage(ImageSource.camera),
             ),
             Container(
               width: 250.0,
               height: 200.0,
-              child: file == null ? Image.network('http://localhost$urlPicture') : Image.file(file) ,
+              child: file == null
+                  ? Image.network('http://localhost$urlPicture')
+                  : Image.file(file),
             ),
             IconButton(
               icon: Icon(Icons.add_photo_alternate),
-              onPressed: () => getImageGa(),
+              onPressed: () => chooseImage(ImageSource.gallery),
             ),
           ],
         ),
       );
 
-  Future getImageCa() async {
-    final pickedFile = await picker.getImage(source: ImageSource.camera);
+  Future<Null> chooseImage(ImageSource source) async {
+    try {
+      var object = await ImagePicker()
+          .getImage(source: source, maxWidth: 800.0, maxHeight: 800.0);
 
-    setState(() {
-      if (pickedFile != null) {
-        file = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
-  }
-
-  Future getImageGa() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFile != null) {
-        file = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
+      setState(() {
+        file = File(object.path);
+      });
+    } catch (e) {}
   }
 
   Widget nameShopForm() => Row(
