@@ -174,7 +174,7 @@ class _AddInfoShopState extends State<AddInfoShop> {
                 Icons.add_a_photo,
                 size: 36.0,
               ),
-              onPressed: () => getImageCa(),
+              onPressed: () => chooseImage(ImageSource.camera),
             ),
             Container(
               width: 250.0,
@@ -187,34 +187,24 @@ class _AddInfoShopState extends State<AddInfoShop> {
                 Icons.add_photo_alternate,
                 size: 36.0,
               ),
-              onPressed: () => getImageGa(),
+              onPressed: () => chooseImage(ImageSource.gallery),
             ),
           ],
         ),
       );
 
-  Future getImageCa() async {
-    final pickedFile = await picker.getImage(source: ImageSource.camera);
+  Future<Null> chooseImage(ImageSource imageSource) async {
+    try {
+      var object = await ImagePicker().getImage(
+        source: imageSource,
+        maxHeight: 800.0,
+        maxWidth: 800.0,
+      );
 
-    setState(() {
-      if (pickedFile != null) {
-        file = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
-  }
-
-  Future getImageGa() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFile != null) {
-        file = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
+      setState(() {
+        file = File(object.path);
+      });
+    } catch (e) {}
   }
 
   Widget nameForm() => Row(
