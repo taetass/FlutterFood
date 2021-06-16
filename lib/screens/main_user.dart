@@ -1,10 +1,8 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_appfood/model/user_model.dart';
 import 'package:flutter_appfood/utility/my_style.dart';
 import 'package:flutter_appfood/utility/signout_process.dart';
+import 'package:flutter_appfood/widget/show_list_shop_all.dart';
+import 'package:flutter_appfood/widget/show_status_food.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainUser extends StatefulWidget {
@@ -14,36 +12,16 @@ class MainUser extends StatefulWidget {
 
 class _MainUserState extends State<MainUser> {
   String nameUser;
-  List<UserModel> userModels = List();
-  List<Widget> shopCards = List();
+  Widget currentWidget;
 
   @override
   void initState() {
     super.initState();
+    currentWidget = ShowListShopAll();
     findUser();
-    readShop();
   }
 
-  Future<Null> readShop() async {
-    String url =
-        'http://localhost/FlutterFood/getUserWhereChooseType.php?isAdd=true&ChooseType=Shop';
-    await Dio().get(url).then((value) {
-      // print('value = $value');
-      var result = json.decode(value.data);
-      for (var map in result) {
-        UserModel model = UserModel.fromJson(map);
-       
-        String nameShop = model.nameShop;
-        if (nameShop.isNotEmpty) {
-          print('nameShop = ${model.nameShop}');
-          setState(() {
-            userModels.add(model);
-            shopCards.add(createCard(model));
-          });
-        }
-      }
-    });
-  }
+  
 
   Future<Null> findUser() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -65,29 +43,87 @@ class _MainUserState extends State<MainUser> {
         ],
       ),
       drawer: showDrawer(),
-      body: shopCards.length == 0
-          ? MyStyle().showProgress()
-          : GridView.extent(
-              maxCrossAxisExtent: 150.0,
-              children: shopCards,
-            ),
+      body: currentWidget,
     );
   }
 
   Drawer showDrawer() => Drawer(
-        child: ListView(
+        child: Stack(
           children: <Widget>[
-            showHead(),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                showHead(),
+                menuListShop(),
+                // menuCart(),
+                menuStatusFoodOrder(),
+              ],
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                menuSignOut(),
+              ],
+            ),
           ],
         ),
       );
+
+  ListTile menuListShop() {
+    return ListTile(
+      onTap: () {
+        Navigator.pop(context);
+        setState(() {
+          currentWidget = ShowListShopAll();
+        });
+      },
+      leading: Icon(Icons.home),
+      title: Text('แสดงร้านค้า'),
+      subtitle: Text('แสดงร้านค้า ที่สามารถสั่งอาหารได้'),
+    );
+  }
+
+  ListTile menuStatusFoodOrder() {
+    return ListTile(
+      onTap: () {
+        Navigator.pop(context);
+        setState(() {
+          currentWidget = ShowStatusFoodOrder();
+        });
+      },
+      leading: Icon(Icons.restaurant_menu),
+      title: Text('แสดงรายการอาหารที่สั่ง'),
+      subtitle: Text('แสดงรายการอาหารที่สั่ง และ หรือ ดูสถานะของอาหารที่สั่ง'),
+    );
+  }
+
+  Widget menuSignOut() {
+    return Container(
+      decoration: BoxDecoration(color: Colors.red.shade700),
+      child: ListTile(
+        onTap: () => signOutProcess(context),
+        leading: Icon(
+          Icons.exit_to_app,
+          color: Colors.white,
+        ),
+        title: Text(
+          'Sign Out',
+          style: TextStyle(color: Colors.white),
+        ),
+        subtitle: Text(
+          'การออกจากแอพ',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
 
   UserAccountsDrawerHeader showHead() {
     return UserAccountsDrawerHeader(
       decoration: MyStyle().myBoxDecoration('draw1.jpg'),
       currentAccountPicture: MyStyle().showLogo(),
       accountName: Text(
-        'Name login',
+        nameUser == null ? 'Name Login' : nameUser,
         style: TextStyle(color: MyStyle().darkColor),
       ),
       accountEmail: Text(
@@ -97,18 +133,5 @@ class _MainUserState extends State<MainUser> {
     );
   }
 
-  Widget createCard(UserModel userModel) {
-    return Card(
-      child: Column(
-        children: <Widget>[
-          Container(
-            width: 80.0,
-            height: 80.0,
-            child: Image.network('http://localhost/${userModel.urlPicture}'),
-          ),
-          Text(userModel.nameShop),
-        ],
-      ),
-    );
-  }
+  
 }
