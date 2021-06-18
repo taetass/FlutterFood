@@ -231,7 +231,6 @@ class _AddInfoShopState extends State<AddInfoShop> {
             width: 250.0,
             child: TextField(
               onChanged: (value) => address = value.trim(),
-              keyboardType: TextInputType.phone,
               decoration: InputDecoration(
                 labelText: 'ที่อยู่ร้านค้า',
                 prefixIcon: Icon(Icons.home),
@@ -249,6 +248,7 @@ class _AddInfoShopState extends State<AddInfoShop> {
             width: 250.0,
             child: TextField(
               onChanged: (value) => phone = value.trim(),
+              keyboardType: TextInputType.phone,
               decoration: InputDecoration(
                 labelText: 'เบอร์ติดต่อร้านค้า',
                 prefixIcon: Icon(Icons.phone),

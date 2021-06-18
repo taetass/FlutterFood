@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_appfood/model/user_model.dart';
 import 'package:flutter_appfood/screens/main_rider.dart';
 import 'package:flutter_appfood/screens/main_shop.dart';
 import 'package:flutter_appfood/screens/main_user.dart';
+import 'package:flutter_appfood/screens/show_shop_food_menu.dart';
 import 'package:flutter_appfood/screens/signin.dart';
 import 'package:flutter_appfood/screens/signup.dart';
 import 'package:flutter_appfood/utility/my_style.dart';
@@ -14,10 +19,47 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  String nameUser;
+  List<UserModel> userModels = List();
+  List<Widget> shopCards = List();
+
   @override
   void initState() {
     super.initState();
     checkPreference();
+    findUser();
+    readShop();
+  }
+
+  Future<Null> readShop() async {
+    String url =
+        'http://localhost/FlutterFood/getUserWhereChooseType.php?isAdd=true&ChooseType=Shop';
+    await Dio().get(url).then((value) {
+      // print('value = $value');
+      var result = json.decode(value.data);
+      int index = 0;
+      for (var map in result) {
+        UserModel model = UserModel.fromJson(map);
+
+        String nameShop = model.nameShop;
+        if (nameShop.isNotEmpty) {
+          print('nameShop = ${model.nameShop}');
+          setState(() {
+            userModels.add(model);
+            shopCards.add(createCard(model, index));
+            index++;
+          });
+        }
+        
+      }
+    });
+  }
+
+  Future<Null> findUser() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      nameUser = preferences.getString('Name');
+    });
   }
 
   Future<Null> checkPreference() async {
@@ -48,6 +90,14 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(),
       drawer: showDrawer(),
+      body: shopCards.length == 0
+          ? MyStyle().showProgress()
+          : GridView.extent(
+              maxCrossAxisExtent: 200.0,
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
+              children: shopCards,
+            ),
     );
   }
 
@@ -93,6 +143,36 @@ class _HomeState extends State<Home> {
       currentAccountPicture: MyStyle().showLogo(),
       accountName: Text('Guest'),
       accountEmail: Text('Please login'),
+    );
+  }
+
+  Widget createCard(UserModel userModel, int index) {
+    return GestureDetector(onTap: () {
+      print('you click index $index');
+      MaterialPageRoute route = MaterialPageRoute(
+          builder: (context) => ShowShopFoodMenu(
+            userModel: userModels[index],
+          ),
+        );
+        Navigator.push(context, route);
+    },
+          child: Card(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              width: 80.0,
+              height: 80.0,
+              child: CircleAvatar(
+                backgroundImage:
+                    NetworkImage('http://localhost/${userModel.urlPicture}'),
+              ),
+            ),
+            MyStyle().mySizedbox(),
+            MyStyle().showTitleH2(userModel.nameShop),
+          ],
+        ),
+      ),
     );
   }
 }
