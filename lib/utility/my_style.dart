@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_appfood/screens/show_cart.dart';
 
 class MyStyle {
   Color darkColor = Colors.blue.shade500;
   Color primaryColor = Colors.lightGreen.shade300;
+
+  Widget iconShowCart(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.add_shopping_cart),
+      onPressed: () {
+        MaterialPageRoute route = MaterialPageRoute(
+          builder: (context) => ShowCart(),
+        );
+        Navigator.push(context, route);
+      },
+    );
+  }
 
   Widget showProgress() {
     return Center(child: CircularProgressIndicator(),);
@@ -75,6 +88,43 @@ class MyStyle {
           image: AssetImage('images/$namePic'), fit: BoxFit.cover),
     );
   }
+
+
+  Text showTitleH3(String title) => Text(
+        title,
+        style: TextStyle(
+          fontSize: 16.0,
+          color: Colors.blue.shade900,
+          fontWeight: FontWeight.w500,
+        ),
+      );
+
+  Text showTitleH3White(String title) => Text(
+        title,
+        style: TextStyle(
+          fontSize: 16.0,
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+      );
+
+  Text showTitleH3Red(String title) => Text(
+        title,
+        style: TextStyle(
+          fontSize: 16.0,
+          color: Colors.red.shade900,
+          fontWeight: FontWeight.w500,
+        ),
+      );
+
+  Text showTitleH3Purple(String title) => Text(
+        title,
+        style: TextStyle(
+          fontSize: 16.0,
+          color: Colors.purple.shade700,
+          fontWeight: FontWeight.w500,
+        ),
+      );
 
   MyStyle();
 }
