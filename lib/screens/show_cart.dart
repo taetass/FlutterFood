@@ -1,7 +1,9 @@
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_appfood/model/cart_model.dart';
 import 'package:flutter_appfood/utility/my_style.dart';
+import 'package:flutter_appfood/utility/normal_dialog.dart';
 import 'package:flutter_appfood/utility/sqlite_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -332,6 +334,27 @@ class _ShowCartState extends State<ShowCart> {
     print(
         'idFood = $idFood, nameFood = $nameFood, price = $price, amount = $amount, sum = $sum');
 
+    String url =
+        'http://localhost/FlutterFood/addOrder.php?isAdd=true&OrderDateTime=$orderDateTime&idUser=$idUser&NameUser=$nameUser&idShop=$idShop&NameShop=$nameShop&Distance=$distance&Transport=$transport&idFood=$idFood&NameFood=$nameFood&Price=$price&Amount=$amount&Sum=$sum&idRider=none&Status=UserOrder';
 
+    await Dio().get(url).then((value) {
+      if (value.toString() == 'true') {
+        clearAllSQLite();
+        //notificationToShop(idShop);
+      } else {
+        normolDialog(context, 'ไม่สามารถ Order ได้ กรุณาลองใหม่');
+      }
+    });
+  }
+  
+  Future<Null> clearAllSQLite() async {
+    // Toast.show(
+    //   'Order เรียบร้อยแล้ว คะ',
+    //   context,
+    //   duration: Toast.LENGTH_LONG,
+    // );
+    await SQLiteHelper().deleteAllData().then((value) {
+      readSQLite();
+    });
   }
 }

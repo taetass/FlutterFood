@@ -50,7 +50,6 @@ class _HomeState extends State<Home> {
             index++;
           });
         }
-        
       }
     });
   }
@@ -147,30 +146,30 @@ class _HomeState extends State<Home> {
   }
 
   Widget createCard(UserModel userModel, int index) {
-    return GestureDetector(onTap: () {
-      print('you click index $index');
-      MaterialPageRoute route = MaterialPageRoute(
+    return GestureDetector(
+      onTap: () {
+        print('you click index $index');
+        MaterialPageRoute route = MaterialPageRoute(
           builder: (context) => ShowShopFoodMenu(
             userModel: userModels[index],
           ),
         );
         Navigator.push(context, route);
-    },
-          child: Card(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              width: 80.0,
-              height: 80.0,
-              child: CircleAvatar(
-                backgroundImage:
-                    NetworkImage('http://localhost/${userModel.urlPicture}'),
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                width: 100.0,
+                height: 100.0,
+                child: Image.network('http://localhost/${userModel.urlPicture}',fit: BoxFit.cover,),
               ),
-            ),
-            MyStyle().mySizedbox(),
-            MyStyle().showTitleH2(userModel.nameShop),
-          ],
+              MyStyle().mySizedbox(),
+              MyStyle().showTitleH2(userModel.nameShop),
+            ],
+          ),
         ),
       ),
     );

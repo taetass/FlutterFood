@@ -5,6 +5,7 @@ import 'package:flutter_appfood/model/user_model.dart';
 import 'package:flutter_appfood/screens/main_rider.dart';
 import 'package:flutter_appfood/screens/main_shop.dart';
 import 'package:flutter_appfood/screens/main_user.dart';
+import 'package:flutter_appfood/utility/const.dart';
 import 'package:flutter_appfood/utility/my_style.dart';
 import 'package:flutter_appfood/utility/normal_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -105,9 +106,9 @@ class _SignInState extends State<SignIn> {
 
   Future<Null> routeTuService(Widget myWidget, UserModel userModel) async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.setString('id', userModel.id);
-    preferences.setString('ChooseType', userModel.chooseType);
-    preferences.setString('Name', userModel.name);
+    preferences.setString(MyConstant().keyId, userModel.id);
+    preferences.setString(MyConstant().keyType, userModel.chooseType);
+    preferences.setString(MyConstant().keyName, userModel.name);
 
     MaterialPageRoute route = MaterialPageRoute(builder: (context) => myWidget);
     Navigator.pushAndRemoveUntil(context, route, (route) => false);
